@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calming Quotes</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background:url("mood.jpg");
+      font-size: 100%;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      transition: background 0.3s, color 0.3s;
+      
+  background-size: cover;        
+  background-repeat: no-repeat; 
+  background-position: center;  
+  background-attachment: fixed;  
+    }
+
+    body.dark {
+      background: #1f1f1f;
+      color: #e0f7fa;
+    }
+
+    h2, h3 {
+      text-align: center;
+      margin: 10px 0;
+      width: 100%;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 15px 0;
+      width: 100%;
+    }
+
+    select, button, textarea, input {
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background-color: greenyellow;
+      font-size: 16px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    body.dark select,
+    body.dark button,
+    body.dark textarea {
+      background-color: #333;
+      color: #fff;
+      border-color: #666;
+    }
+
+    #quote {
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+      font-size: 20px;
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, green, black); 
+      color: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: background 0.3s;
+    }
+
+    body.dark #quote {
+      background-color: #2e2e2e;
+    }
+
+    #anime {
+      margin-top: 20px;
+      width: 100%;
+      max-width: 300px;
+      height: auto;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+      display: none;
+    }
+
+    textarea {
+      height: 60px;
+      resize: none;
+    }
+
+    @media (max-width: 600px) {
+      #quote {
+        font-size: 18px;
+        padding: 15px;
+      }
+
+      textarea {
+        height: 80px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🌿 Start Your Day with Sekhenene's Best Quote Generator</h2>
+
+  <div class="controls">
+    <select id="category" onchange="filterQuotes()">
+      <option value="all">All Categories</option>
+      <option value="peace">Peace</option>
+      <option value="gratitude">gratitude</option>
+      <option value="self">Self-Compassion</option>
+      <option value="mindfulness">Mindfulness</option>
+      <option value="healing">Healing</option>
+    </select>
+
+    <button onclick="showQuote()">Show Quote</button>
+    <button onclick="toggleMusic()" id="musicBtn">Pause Music</button>
+    <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
+  </div>
+
+  <div id="quote"></div>
+
+
+  <audio id="bg-music" autoplay loop>
+    <source src="mood.mp3" type="audio/mp3">
+  </audio>
+
+  <script>
+     let allQuotes = [
+  { text: "Breathe. Let go. And remind yourself that this very moment is the only one you know you have for sure.", category: "mindfulness" },
+  { text: "Peace is not the absence of chaos, but the presence of tranquility in the midst of it.", category: "peace" },
+  { text: "Just when the caterpillar thought the world was over, it became a butterfly.", category: "self" },
+  { text: "You don’t have to control your thoughts. You just have to stop letting them control you.", category: "mindfulness" },
+  { text: "Be still. The quieter you become, the more you can hear.", category: "mindfulness" },
+  { text: "Feelings are just visitors. Let them come and go.", category: "mindfulness" },
+  { text: "One day at a time. One breath at a time.", category: "healing" },
+  { text: "Nothing is permanent in this world, not even our troubles.", category: "peace" },
+  { text: "You are the sky. Everything else is just the weather.", category: "mindfulness" },
+  { text: "Sometimes the most productive thing you can do is relax.", category: "peace" },
+  { text: "Let go of what you can’t control. The peace you seek begins there.", category: "peace" },
+  { text: "Worrying doesn’t take away tomorrow’s troubles, it takes away today’s peace.", category: "peace" },
+  { text: "This too shall pass.", category: "healing" },
+  { text: "If it’s out of your hands, it deserves freedom from your mind too.", category: "mindfulness" },
+  { text: "Slow down. You’re doing fine. You can’t be everything you want to be before your time.", category: "self" },
+  { text: "You are doing better than you think.", category: "self" },
+  { text: "You are enough, just as you are.", category: "self" },
+  { text: "You have survived 100% of your worst days.", category: "healing" },
+  { text: "Be kind to yourself. You’re doing the best you can.", category: "self" },
+  { text: "No storm, not even the one in your life, can last forever.", category: "healing" },
+  { text: "Do not anticipate trouble, or worry about what may never happen. Keep in the sunlight.", category: "mindfulness" },
+  { text: "The best way out is always through.", category: "healing" },
+  { text: "You are not a drop in the ocean. You are the entire ocean in a drop.", category: "self" },
+  { text: "Take rest; a field that has rested gives a bountiful crop.", category: "healing" },
+  { text: "Almost everything will work again if you unplug it for a few minutes... including you.", category: "self" },
+  { text: "Nothing can bring you peace but yourself.", category: "peace" },
+  { text: "You don’t have to figure everything out right now. Breathe.", category: "mindfulness" },
+  { text: "There is a calmness to a life lived in gratitude.", category: "gratitude" },
+  { text: "Healing takes time, and asking for help is a courageous step.", category: "healing" },
+  { text: "Rest is not idleness, and to lie sometimes on the grass... is by no means a waste of time.", category: "peace" },
+  { text: "Even the darkest night will end and the sun will rise.", category: "healing" },
+  { text: "Life is very simple, but we insist on making it complicated.", category: "mindfulness" },
+  { text: "Nothing is worth losing your inner peace.", category: "peace" },
+  { text: "Go easy on yourself. Whatever you do today, let it be enough.", category: "self" },
+  { text: "It’s okay to not be okay. Just don’t stay there.", category: "healing" },
+  { text: "Give yourself permission to rest. You’re not lazy, you’re healing.", category: "healing" },
+  { text: "Storms make trees take deeper roots. ", category: "healing" },
+  { text: "A quiet mind is able to hear intuition over fear.", category: "mindfulness" },
+  { text: "You deserve the same care you give to others.", category: "self" },
+  { text: "Be patient with yourself. Nothing in nature blooms all year.", category: "self" },
+  { text: "Gratitude turns what we have into enough.", category: "gratitude" },
+  { text: "Gratitude is the fairest blossom which springs from the soul. ", category: "gratitude" },
+  { text: "Feeling gratitude and not expressing it is like wrapping a present and not giving it.", category: "gratitude" },
+  { text: "Gratitude makes sense of our past, brings peace for today, and creates a vision for tomorrow. ", category: "gratitude" },
+  { text: "Start each day with a grateful heart.", category: "gratitude" },
+  { text: "Be patient with yourself. Nothing in nature blooms all year.", category: "self" }
+];
+
+    let filteredQuotes = [...allQuotes];
+
+    function showQuote() {
+      if (filteredQuotes.length === 0) {
+        document.getElementById("quote").textContent = "No quotes found for this category.";
+        return;
+      }
+      const index = Math.floor(Math.random() * filteredQuotes.length);
+      document.getElementById("quote").textContent = filteredQuotes[index].text;
+
+      const animeImg = document.getElementById("anime");
+      animeImg.style.display = "block";
+    }
+
+    function filterQuotes() {
+      const category = document.getElementById("category").value;
+      filteredQuotes = category === "all"
+        ? [...allQuotes]
+        : allQuotes.filter(q => q.category === category);
+      document.getElementById("quote").textContent = "";
+      document.getElementById("anime").style.display = "none";
+    }
+
+    function addQuote() {
+      const quoteText = document.getElementById("newQuote").value.trim();
+      const quoteCat = document.getElementById("newCategory").value;
+
+      if (quoteText === "") {
+        alert("Please enter a quote.");
+        return;
+      }
+
+      const newQuote = { text: quoteText, category: quoteCat };
+      allQuotes.push(newQuote);
+      localStorage.setItem("quotes", JSON.stringify(allQuotes));
+      filterQuotes();
+      document.getElementById("newQuote").value = "";
+      alert("Quote added and saved!");
+    }
+
+    function toggleMusic() {
+      const music = document.getElementById("bg-music");
+      const btn = document.getElementById("musicBtn");
+      if (music.paused) {
+        music.play();
+        btn.textContent = "Pause Music";
+      } else {
+        music.pause();
+        btn.textContent = "Play Music";
+      }
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+    }
+  </script>
+
+</body>
+</html>
